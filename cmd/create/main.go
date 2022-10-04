@@ -8,5 +8,5 @@ import (
 
 func main() {
 	flag.Parse()
-	create.InteractiveCommand("go run Create.go " + strings.Join(flag.Args(), " "))
+	create.InteractiveCommand("go run Createfile " + strings.Join(flag.Args(), " "))
 }
