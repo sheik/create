@@ -53,17 +53,13 @@ func (steps Steps) Execute(name string) (err error) {
 			err = fmt.Errorf("target \"%s\" did not pass gate: %s", name, path.Base(runtime.FuncForPC(reflect.ValueOf(step.Gate).Pointer()).Name()))
 			return
 		}
-		if step.Check && !step.executed {
-			fmt.Println(color.Purple("[-] skipping ", name))
-			step.executed = true
-			steps[name] = step
-			return
-		}
+
 		for _, stepName := range steps[name].Depends {
 			if !steps[name].executed {
 				steps.ProcessTarget(stepName)
 			}
 		}
+
 		if !step.executed {
 			fmt.Println(color.Green("[*] executing ", name))
 			if *verbose {
@@ -151,8 +147,15 @@ func Plan(steps Steps) {
 func (steps Steps) ProcessTarget(name string) {
 	var err error
 	preconditionFailed := false
-	if steps[name].Precondition != "" {
-		err = Command(steps[name].Precondition)
+	step := steps[name]
+	if step.Check && !step.executed {
+		fmt.Println(color.Purple("[-] skipping ", name))
+		step.executed = true
+		steps[name] = step
+		return
+	}
+	if step.Precondition != "" {
+		err = Command(step.Precondition)
 		if err != nil {
 			preconditionFailed = true
 			fmt.Printf(color.Teal("[X] failed precondition for %s\n"), name)
@@ -162,12 +165,12 @@ func (steps Steps) ProcessTarget(name string) {
 		err = steps.Execute(name)
 	}
 	if err != nil || preconditionFailed {
-		if steps[name].Fail != "" {
-			fmt.Printf(color.Teal("[X] error running target \"%s\": failing over to %s\n"), name, steps[name].Fail)
-			err = steps.Execute(steps[name].Fail)
+		if step.Fail != "" {
+			fmt.Printf(color.Teal("[X] error running target \"%s\": failing over to %s\n"), name, step.Fail)
+			err = steps.Execute(step.Fail)
 		}
 		if err != nil {
-			fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), flag.Arg(0), err)
+			fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), name, err)
 		}
 	}
 }
