@@ -19,7 +19,7 @@ var (
 )
 
 func IncrementMinorVersion(version string) string {
-	parts := strings.Split(version, ".")
+	parts := strings.Split(strings.Split(version, "-")[0], ".")
 	if len(parts) != 3 {
 		return version
 	}
