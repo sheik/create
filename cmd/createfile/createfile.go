@@ -25,7 +25,7 @@ func IncrementMinorVersion(version string) string {
 	}
 	if minorVersion, err := strconv.Atoi(parts[2]); err == nil {
 		minorVersion += 1
-		return parts[0] + parts[1] + fmt.Sprintf("%d", minorVersion)
+		return fmt.Sprintf("%s.%s.%d", parts[0], parts[1], minorVersion)
 	} else {
 		return version
 	}
