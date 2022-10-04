@@ -45,9 +45,7 @@ func (s Steps) Execute(name string) (err error) {
 		}
 		if !step.executed {
 			fmt.Println(color.Green("[*] executing ", name))
-			if *verbose {
-				fmt.Println(step.Command)
-			}
+			fmt.Println(step.Command)
 			if step.Interactive {
 				err = InteractiveCommand(step.Command)
 			} else {
