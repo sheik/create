@@ -116,6 +116,7 @@ var UpdateStep = Step{
 		go clean -modcache
 		sed -i "s/^.*github.com\/sheik\/create.*$//g" go.mod
 		go mod tidy
+		go mod vendor
 		go install github.com/sheik/create/cmd/create@latest
 		`,
 }
