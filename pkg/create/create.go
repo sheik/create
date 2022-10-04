@@ -158,11 +158,11 @@ func (steps Steps) ProcessTarget(name string) {
 		err = Command(steps[name].Precondition)
 		if err != nil {
 			preconditionFailed = true
+			fmt.Printf(color.Teal("[X] failed precondition for %s"), name)
 		}
-		fmt.Printf(color.Teal("[X] failed precondition for %s"), name)
 	}
 	if !preconditionFailed {
-		steps.ProcessTarget(name)
+		err = steps.Execute(name)
 	}
 	if err != nil || preconditionFailed {
 		if steps[name].Fail != "" {
