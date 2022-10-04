@@ -22,6 +22,9 @@ func command(cmdline string) error {
 }
 
 func Output(cmdline string) string {
+	if *verbose {
+		fmt.Println(cmdline)
+	}
 	outBytes, _ := exec.Command("/bin/bash", "-c", cmdline).Output()
 	return strings.TrimSuffix(string(outBytes), "\n")
 }
