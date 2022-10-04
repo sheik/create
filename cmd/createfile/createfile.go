@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/sheik/create/pkg/create"
+	"github.com/sheik/create/pkg/git"
 )
 
 var (
@@ -28,7 +29,7 @@ var steps = create.Steps{
 	},
 	"build": create.Step{
 		Command: docker + " go build ./cmd/create",
-		Gate:    create.GitRepoClean,
+		Gate:    git.RepoClean,
 		Check:   create.Bash("stat create &>/dev/null"),
 		Depends: create.Complete("build_container"),
 		Help:    "build the go binary",
