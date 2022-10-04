@@ -46,6 +46,10 @@ func Output(cmdline string) string {
 
 func (s Steps) Execute(name string) (err error) {
 	if step, ok := s[name]; ok {
+		if !step.Gate {
+			err = fmt.Errorf("did not pass gate")
+			return
+		}
 		if step.Check && !step.executed {
 			fmt.Println(color.Purple("[-] skipping ", name))
 			step.executed = true
@@ -85,6 +89,7 @@ func (s Steps) Execute(name string) (err error) {
 type Step struct {
 	Command     string
 	Check       bool
+	Gate        bool
 	Help        string
 	Depends     []string
 	Default     bool

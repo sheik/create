@@ -44,8 +44,10 @@ var steps = create.Steps{
 		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", docker, version),
 		Check:   create.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
 		Depends: create.Complete("build_container", "build", "pre-package"),
-		Default: true,
 		Help:    "create rpm",
+	},
+	"commit": create.Step{
+		Command: "git commit -a -m \"$@\"",
 	},
 	"shell": create.Step{
 		Command:     dockerInteractive + " /bin/bash",
