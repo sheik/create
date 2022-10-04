@@ -13,7 +13,7 @@ var (
 	docker            = "docker run -h builder --rm -v $PWD:/code " + imageName
 	dockerInteractive = "docker run -h builder --rm -v $PWD:/code -it " + imageName
 	version           = create.Output("git describe --tags | sed 's/-/_/g'")
-	newVersion        = create.IncrementMinorVersion(version)
+	newVersion        = git.IncrementMinorVersion(version)
 	rpm               = fmt.Sprintf("%s-%s-1.x86_64.rpm", project, version)
 )
 
