@@ -1,0 +1,4 @@
+
+build:
+	@go install ./...
+	@create
