@@ -62,11 +62,7 @@ func (s Steps) Execute(name string) (err error) {
 			if *verbose {
 				fmt.Println(step.Command)
 			}
-			if step.Interactive {
-				err = InteractiveCommand(step.Command)
-			} else {
-				err = Command(step.Command)
-			}
+			err = InteractiveCommand(step.Command)
 			if err != nil {
 				return
 			}
