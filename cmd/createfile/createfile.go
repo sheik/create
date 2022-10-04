@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/sheik/create/pkg/create"
+	"github.com/sheik/create/pkg/docker"
 	"github.com/sheik/create/pkg/git"
 )
 
@@ -10,7 +11,7 @@ var (
 	project           = "create"
 	buildVersion      = create.Output("grep VERSION builder/Dockerfile | cut -d'=' -f2")
 	imageName         = "builder:" + buildVersion
-	docker            = "docker run -h builder --rm -v $PWD:/code " + imageName
+	dockerRun         = "docker run -h builder --rm -v $PWD:/code " + imageName
 	dockerInteractive = "docker run -h builder --rm -v $PWD:/code -it " + imageName
 	version           = create.Output("git describe --tags | sed 's/-/_/g'")
 	newVersion        = git.IncrementMinorVersion(version)
@@ -24,11 +25,11 @@ var steps = create.Steps{
 	},
 	"build_container": create.Step{
 		Command: fmt.Sprintf("docker build . -f builder/Dockerfile --tag %s", imageName),
-		Check:   create.DockerImageExists(imageName),
+		Check:   docker.ImageExists(imageName),
 		Help:    "create the docker container used for building",
 	},
 	"build": create.Step{
-		Command: docker + " go build ./cmd/create",
+		Command: dockerRun + " go build ./cmd/create",
 		Gate:    git.RepoClean,
 		Check:   create.Bash("stat create &>/dev/null"),
 		Depends: create.Complete("build_container"),
@@ -43,7 +44,7 @@ var steps = create.Steps{
 		Help:    "prepare dir structure for packaging",
 	},
 	"package": create.Step{
-		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", docker, version),
+		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", dockerRun, version),
 		Check:   create.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
 		Depends: create.Complete("build_container", "build", "pre-package"),
 		Help:    "create rpm",
