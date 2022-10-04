@@ -1,13 +1,16 @@
 package main
 
 import (
-	"flag"
 	"github.com/sheik/create/pkg/create"
+	"os"
 	"strings"
 )
 
 func main() {
-	flag.Parse()
 	create.InteractiveCommand("go build -o Createfile ./cmd/createfile")
-	create.InteractiveCommand("./Createfile " + strings.Join(flag.Args(), " "))
+	var args string
+	if len(os.Args) > 1 {
+		args = strings.Join(os.Args[1:], " ")
+	}
+	create.InteractiveCommand("./Createfile " + args)
 }
