@@ -127,7 +127,7 @@ func Plan(steps Steps) {
 		}
 		err := steps.Execute(flag.Arg(0))
 		if err != nil {
-			fmt.Printf("error running target \"%s\": %s\n", flag.Arg(0), err)
+			fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), flag.Arg(0), err)
 		}
 		return
 	}
@@ -135,7 +135,7 @@ func Plan(steps Steps) {
 		if step.Default {
 			err := steps.Execute(name)
 			if err != nil {
-				fmt.Printf("error running target \"%s\": %s\n", name, err)
+				fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), name, err)
 			}
 		}
 	}
