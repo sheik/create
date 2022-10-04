@@ -162,7 +162,7 @@ func (steps Steps) ProcessTarget(name string) {
 		fmt.Printf(color.Teal("[X] failed precondition for %s"), name)
 	}
 	if !preconditionFailed {
-		err = steps.Execute(name)
+		steps.ProcessTarget(name)
 	}
 	if err != nil || preconditionFailed {
 		if steps[name].Fail != "" {
