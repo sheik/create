@@ -14,7 +14,7 @@ var (
 	verbose = flag.Bool("v", false, "more verbose output")
 )
 
-func command(cmdline string) error {
+func Command(cmdline string) error {
 	cmd := exec.Command("/bin/bash", "-c", cmdline)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -22,7 +22,9 @@ func command(cmdline string) error {
 }
 
 func Output(cmdline string) string {
-	fmt.Println(cmdline)
+	if *verbose {
+		fmt.Println("evaluating: " + cmdline)
+	}
 	outBytes, _ := exec.Command("/bin/bash", "-c", cmdline).Output()
 	return strings.TrimSuffix(string(outBytes), "\n")
 }
@@ -30,7 +32,7 @@ func Output(cmdline string) string {
 func (s Steps) Execute(name string) (err error) {
 	if step, ok := s[name]; ok {
 		if step.Check != "" && !step.executed {
-			err = command(step.Check)
+			err = Command(step.Check)
 			if err == nil {
 				fmt.Println(color.Purple("[-] skipping ", name))
 				step.executed = true
@@ -45,11 +47,13 @@ func (s Steps) Execute(name string) (err error) {
 		}
 		if !step.executed {
 			fmt.Println(color.Green("[*] executing ", name))
-			fmt.Println(step.Command)
+			if *verbose {
+				fmt.Println(step.Command)
+			}
 			if step.Interactive {
 				err = InteractiveCommand(step.Command)
 			} else {
-				err = command(step.Command)
+				err = Command(step.Command)
 			}
 			if err != nil {
 				return
