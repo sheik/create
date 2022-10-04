@@ -47,8 +47,8 @@ func Output(cmdline string) string {
 	return strings.TrimSuffix(string(outBytes), "\n")
 }
 
-func (s Steps) Execute(name string) (err error) {
-	if step, ok := s[name]; ok {
+func (steps Steps) Execute(name string) (err error) {
+	if step, ok := steps[name]; ok {
 		if step.Gate != nil && !step.Gate() {
 			err = fmt.Errorf("target \"%s\" did not pass gate: %s", name, path.Base(runtime.FuncForPC(reflect.ValueOf(step.Gate).Pointer()).Name()))
 			return
@@ -56,12 +56,12 @@ func (s Steps) Execute(name string) (err error) {
 		if step.Check && !step.executed {
 			fmt.Println(color.Purple("[-] skipping ", name))
 			step.executed = true
-			s[name] = step
+			steps[name] = step
 			return
 		}
-		for _, stepName := range s[name].Depends {
-			if !s[name].executed {
-				err = s.Execute(stepName)
+		for _, stepName := range steps[name].Depends {
+			if !steps[name].executed {
+				err = steps.Execute(stepName)
 				if err != nil {
 					return
 				}
@@ -81,7 +81,7 @@ func (s Steps) Execute(name string) (err error) {
 				return
 			}
 			step.executed = true
-			s[name] = step
+			steps[name] = step
 		}
 
 		return
@@ -90,15 +90,16 @@ func (s Steps) Execute(name string) (err error) {
 }
 
 type Step struct {
-	Command     string
-	Check       bool
-	Gate        func() bool
-	Fail        string
-	Help        string
-	Depends     []string
-	Default     bool
-	Interactive bool
-	executed    bool
+	Command      string
+	Precondition string
+	Check        bool
+	Gate         func() bool
+	Fail         string
+	Help         string
+	Depends      []string
+	Default      bool
+	Interactive  bool
+	executed     bool
 }
 
 type Steps map[string]Step
@@ -119,40 +120,56 @@ var UpdateStep = Step{
 		`,
 }
 
+func (steps Steps) PrintHelp() {
+	var items []string
+	for name, _ := range steps {
+		items = append(items, name)
+	}
+	sort.Strings(items)
+	for _, item := range items {
+		fmt.Println(color.Green(item), ":", steps[item].Help)
+	}
+}
+
 func Plan(steps Steps) {
 	flag.Parse()
 	steps["update"] = UpdateStep
 	if len(flag.Args()) > 0 {
 		target := flag.Arg(0)
 		if target == "help" {
-			var items []string
-			for name, _ := range steps {
-				items = append(items, name)
-			}
-			sort.Strings(items)
-			for _, item := range items {
-				fmt.Println(color.Green(item), ":", steps[item].Help)
-			}
+			steps.PrintHelp()
 			return
 		}
-		err := steps.Execute(target)
-		if err != nil {
-			if steps[target].Fail != "" {
-				fmt.Printf(color.Teal("[X] error running target \"%s\": failing over to %s\n"), target, steps[target].Fail)
-				err = steps.Execute(steps[target].Fail)
-			}
-			if err != nil {
-				fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), flag.Arg(0), err)
-			}
-		}
+		steps.ProcessTarget(target)
 		return
 	}
-	for name, step := range steps {
+	for target, step := range steps {
 		if step.Default {
-			err := steps.Execute(name)
-			if err != nil {
-				fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), name, err)
-			}
+			steps.ProcessTarget(target)
+		}
+	}
+}
+
+func (steps Steps) ProcessTarget(name string) {
+	var err error
+	preconditionFailed := false
+	if steps[name].Precondition != "" {
+		err = Command(steps[name].Precondition)
+		if err != nil {
+			preconditionFailed = true
+		}
+		fmt.Printf(color.Teal("[X] failed precondition for %s"), name)
+	}
+	if !preconditionFailed {
+		err = steps.Execute(name)
+	}
+	if err != nil || preconditionFailed {
+		if steps[name].Fail != "" {
+			fmt.Printf(color.Teal("[X] error running target \"%s\": failing over to %s\n"), name, steps[name].Fail)
+			err = steps.Execute(steps[name].Fail)
+		}
+		if err != nil {
+			fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), flag.Arg(0), err)
 		}
 	}
 }
