@@ -6,6 +6,9 @@ import (
 	"github.com/sheik/create/pkg/color"
 	"os"
 	"os/exec"
+	"path"
+	"reflect"
+	"runtime"
 	"sort"
 	"strings"
 )
@@ -46,8 +49,8 @@ func Output(cmdline string) string {
 
 func (s Steps) Execute(name string) (err error) {
 	if step, ok := s[name]; ok {
-		if !step.Gate {
-			err = fmt.Errorf("did not pass gate")
+		if step.Gate != nil && !step.Gate() {
+			err = fmt.Errorf("target \"%s\" did not pass gate: %s", name, path.Base(runtime.FuncForPC(reflect.ValueOf(step.Gate).Pointer()).Name()))
 			return
 		}
 		if step.Check && !step.executed {
@@ -89,7 +92,7 @@ func (s Steps) Execute(name string) (err error) {
 type Step struct {
 	Command     string
 	Check       bool
-	Gate        bool
+	Gate        func() bool
 	Help        string
 	Depends     []string
 	Default     bool

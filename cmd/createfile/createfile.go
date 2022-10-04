@@ -28,6 +28,7 @@ var steps = create.Steps{
 	},
 	"build": create.Step{
 		Command: docker + " go build ./cmd/create",
+		Gate:    create.GitRepoClean,
 		Check:   create.Bash("stat create &>/dev/null"),
 		Depends: create.Complete("build_container"),
 		Help:    "build the go binary",
@@ -45,6 +46,7 @@ var steps = create.Steps{
 		Check:   create.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
 		Depends: create.Complete("build_container", "build", "pre-package"),
 		Help:    "create rpm",
+		Default: true,
 	},
 	"commit": create.Step{
 		Command: "git commit -a -m \"$@\"",
