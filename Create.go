@@ -6,11 +6,13 @@ import (
 )
 
 var (
+	project           = "create"
 	buildVersion      = create.Output("grep VERSION Dockerfile | cut -d'=' -f2")
 	imageName         = "builder:" + buildVersion
 	docker            = "docker run -h builder --rm -v $PWD:/code " + imageName
 	dockerInteractive = "docker run -h builder --rm -v $PWD:/code -it " + imageName
-	version           = create.Output("git describe --tags")
+	version           = create.Output("git describe --tags | sed 's/-/_/g'")
+	rpm               = fmt.Sprintf("create-%s-1.x86_64.rpm", version)
 )
 
 var steps = create.Steps{
@@ -35,7 +37,7 @@ var steps = create.Steps{
 	},
 	"package": create.Step{
 		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", docker, version),
-		Check:   "stat *.rpm &>/dev/null",
+		Check:   fmt.Sprintf("stat %s &>/dev/null", rpm),
 		Depends: create.Complete("build_container", "build", "pre-package"),
 		Default: true,
 		Help:    "create rpm",

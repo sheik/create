@@ -3,6 +3,7 @@ package create
 import (
 	"flag"
 	"fmt"
+	"github.com/sheik/create/pkg/color"
 	"os"
 	"os/exec"
 	"sort"
@@ -38,8 +39,7 @@ func (s Steps) Execute(name string) (err error) {
 			}
 		}
 		if !step.executed {
-			fmt.Println("executing", name)
-			fmt.Println(step.Command)
+			fmt.Println(color.Green("[*] executing ", name))
 			if step.Interactive {
 				err = InteractiveCommand(step.Command)
 			} else {
