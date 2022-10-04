@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 )
 
 func command(cmdline string) error {
@@ -14,20 +15,20 @@ func command(cmdline string) error {
 	return cmd.Run()
 }
 
-func Output(cmdline string) []byte {
-	out, _ := exec.Command("/bin/bash", "-c", cmdline).Output()
-	return out
+func Output(cmdline string) string {
+	outBytes, _ := exec.Command("/bin/bash", "-c", cmdline).Output()
+	return strings.TrimSuffix(string(outBytes), "\n")
 }
 
-func (s Steps) Execute(name string) error {
+func (s Steps) Execute(name string) (err error) {
 	if step, ok := s[name]; ok {
-		if step.Check != "" {
-			err := command(step.Check)
+		if step.Check != "" && !step.executed {
+			err = command(step.Check)
 			if err == nil {
 				fmt.Println("skipping", name)
 				step.executed = true
 				s[name] = step
-				return nil
+				return
 			}
 		}
 		for _, stepName := range s[name].Depends {
@@ -37,25 +38,31 @@ func (s Steps) Execute(name string) error {
 		}
 		if !step.executed {
 			fmt.Println("executing", name)
-			err := command(step.Command)
+			fmt.Println(step.Command)
+			if step.Interactive {
+				err = InteractiveCommand(step.Command)
+			} else {
+				err = command(step.Command)
+			}
 			if err != nil {
-				return err
+				return
 			}
 			step.executed = true
 			s[name] = step
 		}
 
-		return nil
+		return
 	}
 	return fmt.Errorf("build target \"%s\" not found", name)
 }
 
 type Step struct {
-	Command  string
-	Check    string
-	Depends  []string
-	Default  bool
-	executed bool
+	Command     string
+	Check       string
+	Depends     []string
+	Default     bool
+	Interactive bool
+	executed    bool
 }
 
 type Steps map[string]Step
@@ -67,7 +74,11 @@ func Complete(args ...string) []string {
 func Plan(steps Steps) {
 	flag.Parse()
 	if len(flag.Args()) > 0 {
-		steps.Execute(flag.Arg(0))
+		err := steps.Execute(flag.Arg(0))
+		if err != nil {
+			fmt.Printf("error running target \"%s\": %s\n", flag.Arg(0), err)
+		}
+		return
 	}
 	for name, step := range steps {
 		if step.Default {

@@ -1,3 +1,4 @@
 .idea
 usr
-create
+*.rpm
+/create
