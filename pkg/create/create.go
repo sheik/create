@@ -93,6 +93,7 @@ type Step struct {
 	Command     string
 	Check       bool
 	Gate        func() bool
+	Fail        string
 	Help        string
 	Depends     []string
 	Default     bool
@@ -122,7 +123,8 @@ func Plan(steps Steps) {
 	flag.Parse()
 	steps["update"] = UpdateStep
 	if len(flag.Args()) > 0 {
-		if flag.Arg(0) == "help" {
+		target := flag.Arg(0)
+		if target == "help" {
 			var items []string
 			for name, _ := range steps {
 				items = append(items, name)
@@ -133,9 +135,15 @@ func Plan(steps Steps) {
 			}
 			return
 		}
-		err := steps.Execute(flag.Arg(0))
+		err := steps.Execute(target)
 		if err != nil {
-			fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), flag.Arg(0), err)
+			if steps[target].Fail != "" {
+				fmt.Printf(color.Teal("[X] error running target \"%s\": failing over to %s\n"), target, steps[target].Fail)
+				err = steps.Execute(steps[target].Fail)
+			}
+			if err != nil {
+				fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), flag.Arg(0), err)
+			}
 		}
 		return
 	}
