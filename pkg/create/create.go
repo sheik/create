@@ -61,10 +61,7 @@ func (steps Steps) Execute(name string) (err error) {
 		}
 		for _, stepName := range steps[name].Depends {
 			if !steps[name].executed {
-				err = steps.Execute(stepName)
-				if err != nil {
-					return
-				}
+				steps.ProcessTarget(stepName)
 			}
 		}
 		if !step.executed {
