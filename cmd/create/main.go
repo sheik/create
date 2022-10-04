@@ -8,6 +8,6 @@ import (
 
 func main() {
 	flag.Parse()
-	create.InteractiveCommand("go build -o Createfile ./cmd/create")
+	create.InteractiveCommand("go build -o Createfile ./cmd/createfile")
 	create.InteractiveCommand("./Createfile " + strings.Join(flag.Args(), " "))
 }

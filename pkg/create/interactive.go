@@ -1,7 +1,6 @@
 package create
 
 import (
-	"fmt"
 	"github.com/creack/pty"
 	"golang.org/x/term"
 	"io"
@@ -13,7 +12,6 @@ import (
 )
 
 func InteractiveCommand(command string) error {
-	fmt.Println(command)
 	c := exec.Command("/bin/bash", "-c", command)
 
 	// Start the command with a pty.
