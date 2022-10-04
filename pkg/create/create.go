@@ -32,14 +32,11 @@ func Output(cmdline string) string {
 
 func (s Steps) Execute(name string) (err error) {
 	if step, ok := s[name]; ok {
-		if step.Check != "" && !step.executed {
-			err = Command(step.Check)
-			if err == nil {
-				fmt.Println(color.Purple("[-] skipping ", name))
-				step.executed = true
-				s[name] = step
-				return
-			}
+		if step.Check && !step.executed {
+			fmt.Println(color.Purple("[-] skipping ", name))
+			step.executed = true
+			s[name] = step
+			return
 		}
 		for _, stepName := range s[name].Depends {
 			if !s[name].executed {
@@ -70,7 +67,7 @@ func (s Steps) Execute(name string) (err error) {
 
 type Step struct {
 	Command     string
-	Check       string
+	Check       bool
 	Help        string
 	Depends     []string
 	Default     bool

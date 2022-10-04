@@ -38,12 +38,12 @@ var steps = create.Steps{
 	},
 	"build_container": create.Step{
 		Command: fmt.Sprintf("docker build . -f builder/Dockerfile --tag %s", imageName),
-		Check:   fmt.Sprintf(`bash -c "if [[ \"$(docker images -q %s)\" == \"\" ]]; then exit 1; else exit 0; fi"`, imageName),
+		Check:   create.DockerImageExists(imageName),
 		Help:    "create the docker container used for building",
 	},
 	"build": create.Step{
 		Command: docker + " go build ./cmd/create",
-		Check:   "stat create &>/dev/null",
+		Check:   create.Bash("stat create &>/dev/null"),
 		Depends: create.Complete("build_container"),
 		Help:    "build the go binary",
 	},
@@ -57,7 +57,7 @@ var steps = create.Steps{
 	},
 	"package": create.Step{
 		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", docker, version),
-		Check:   fmt.Sprintf("stat %s &>/dev/null", rpm),
+		Check:   create.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
 		Depends: create.Complete("build_container", "build", "pre-package"),
 		Default: true,
 		Help:    "create rpm",
