@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"sort"
 	"strings"
 )
 
@@ -59,6 +60,7 @@ func (s Steps) Execute(name string) (err error) {
 type Step struct {
 	Command     string
 	Check       string
+	Help        string
 	Depends     []string
 	Default     bool
 	Interactive bool
@@ -74,6 +76,17 @@ func Complete(args ...string) []string {
 func Plan(steps Steps) {
 	flag.Parse()
 	if len(flag.Args()) > 0 {
+		if flag.Arg(0) == "help" {
+			var items []string
+			for name, _ := range steps {
+				items = append(items, name)
+			}
+			sort.Strings(items)
+			for _, item := range items {
+				fmt.Println(item)
+			}
+			return
+		}
 		err := steps.Execute(flag.Arg(0))
 		if err != nil {
 			fmt.Printf("error running target \"%s\": %s\n", flag.Arg(0), err)
