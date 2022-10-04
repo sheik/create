@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+var (
+	verbose = flag.Bool("v", false, "more verbose output")
+)
+
 func command(cmdline string) error {
 	cmd := exec.Command("/bin/bash", "-c", cmdline)
 	cmd.Stdout = os.Stdout
@@ -27,7 +31,7 @@ func (s Steps) Execute(name string) (err error) {
 		if step.Check != "" && !step.executed {
 			err = command(step.Check)
 			if err == nil {
-				fmt.Println("skipping", name)
+				fmt.Println(color.Purple("[-] skipping ", name))
 				step.executed = true
 				s[name] = step
 				return
@@ -40,6 +44,9 @@ func (s Steps) Execute(name string) (err error) {
 		}
 		if !step.executed {
 			fmt.Println(color.Green("[*] executing ", name))
+			if *verbose {
+				fmt.Println(step.Command)
+			}
 			if step.Interactive {
 				err = InteractiveCommand(step.Command)
 			} else {
