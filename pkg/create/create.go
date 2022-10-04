@@ -54,7 +54,10 @@ func (s Steps) Execute(name string) (err error) {
 		}
 		for _, stepName := range s[name].Depends {
 			if !s[name].executed {
-				s.Execute(stepName)
+				err = s.Execute(stepName)
+				if err != nil {
+					return
+				}
 			}
 		}
 		if !step.executed {
