@@ -118,7 +118,7 @@ func Plan(steps Steps) {
 			}
 			sort.Strings(items)
 			for _, item := range items {
-				fmt.Println(item)
+				fmt.Println(color.Green(item), ":", steps[item].Help)
 			}
 			return
 		}
