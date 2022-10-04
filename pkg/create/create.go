@@ -95,8 +95,21 @@ func Complete(args ...string) []string {
 	return args
 }
 
+var UpdateStep = Step{
+	Command: `
+		export GOPRIVATE=github.com
+		touch go.sum
+		rm -f go.sum
+		go clean -modcache
+		sed -i "s/^.*github.com\/sheik\/create.*$//g" go.mod
+		go mod tidy
+		go install github.com/sheik/create/cmd/create@latest
+		`,
+}
+
 func Plan(steps Steps) {
 	flag.Parse()
+	steps["update"] = UpdateStep
 	if len(flag.Args()) > 0 {
 		if flag.Arg(0) == "help" {
 			var items []string
