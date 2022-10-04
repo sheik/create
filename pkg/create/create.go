@@ -22,6 +22,7 @@ func Command(cmdline string) error {
 }
 
 func Output(cmdline string) string {
+	flag.Parse()
 	if *verbose {
 		fmt.Println("evaluating: " + cmdline)
 	}
