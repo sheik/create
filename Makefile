@@ -1,4 +1,0 @@
-
-build:
-	@go install ./...
-	@create

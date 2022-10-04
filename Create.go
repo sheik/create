@@ -7,7 +7,7 @@ import (
 
 var (
 	project           = "create"
-	buildVersion      = create.Output("grep VERSION Dockerfile | cut -d'=' -f2")
+	buildVersion      = create.Output("grep VERSION builder/Dockerfile | cut -d'=' -f2")
 	imageName         = "builder:" + buildVersion
 	docker            = "docker run -h builder --rm -v $PWD:/code " + imageName
 	dockerInteractive = "docker run -h builder --rm -v $PWD:/code -it " + imageName
@@ -21,7 +21,7 @@ var steps = create.Steps{
 		Help:    "clean build artifacts from repo",
 	},
 	"build_container": create.Step{
-		Command: fmt.Sprintf("docker build . --tag %s", imageName),
+		Command: fmt.Sprintf("docker build . -f builder/Dockerfile --tag %s", imageName),
 		Check:   fmt.Sprintf(`bash -c "if [[ \"$(docker images -q %s)\" == \"\" ]]; then exit 1; else exit 0; fi"`, imageName),
 		Help:    "create the docker container used for building",
 	},
