@@ -1,4 +1,4 @@
-package create
+package shell
 
 import (
 	"github.com/creack/pty"

@@ -5,6 +5,7 @@ import (
 	"github.com/sheik/create/pkg/create"
 	"github.com/sheik/create/pkg/docker"
 	"github.com/sheik/create/pkg/git"
+	"github.com/sheik/create/pkg/shell"
 )
 
 var (
@@ -37,7 +38,7 @@ var steps = create.Steps{
 	"build": create.Step{
 		Command: dockerRun + " go build ./cmd/create",
 		Gate:    git.RepoClean,
-		Check:   create.Bash("stat create &>/dev/null"),
+		Check:   shell.Bash("stat create &>/dev/null"),
 		Depends: create.Complete("pull_build_image"),
 		Help:    "build the go binary",
 	},
@@ -47,7 +48,7 @@ var steps = create.Steps{
 	},
 	"package": create.Step{
 		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", dockerRun, version),
-		Check:   create.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
+		Check:   shell.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
 		Depends: create.Complete("pull_build_image", "build", "pre-package"),
 		Help:    "create rpm",
 		Default: true,

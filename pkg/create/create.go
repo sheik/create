@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/sheik/create/pkg/color"
+	"github.com/sheik/create/pkg/shell"
 	"os"
 	"os/exec"
 	"path"
@@ -16,27 +17,6 @@ import (
 var (
 	verbose = flag.Bool("v", false, "more verbose output")
 )
-
-func Command(cmdline string) error {
-	var cmd *exec.Cmd
-	if strings.Contains(cmdline, "\n") {
-		file, err := os.CreateTemp("/tmp", "create-script")
-		if err != nil {
-			return err
-		}
-		defer os.Remove(file.Name())
-		defer file.Close()
-		if _, err := file.WriteString(cmdline); err != nil {
-			return err
-		}
-		cmd = exec.Command("/bin/bash", file.Name())
-	} else {
-		cmd = exec.Command("/bin/bash", "-c", cmdline)
-	}
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
 
 func Output(cmdline string) string {
 	flag.Parse()
@@ -66,9 +46,9 @@ func (steps Steps) Execute(name string) (err error) {
 				fmt.Println(step.Command)
 			}
 			if step.Interactive {
-				err = InteractiveCommand(step.Command)
+				err = shell.InteractiveCommand(step.Command)
 			} else {
-				err = Command(step.Command)
+				err = shell.Exec(step.Command)
 			}
 			if err != nil {
 				return
@@ -160,7 +140,7 @@ func (steps Steps) ProcessTarget(name string) {
 		return
 	}
 	if step.Precondition != "" {
-		err = Command(step.Precondition)
+		err = shell.Exec(step.Precondition)
 		if err != nil {
 			preconditionFailed = true
 			fmt.Printf(color.Teal("[X] failed precondition for %s\n"), name)
