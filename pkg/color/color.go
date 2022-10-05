@@ -3,9 +3,9 @@ package color
 import "fmt"
 
 var (
-	Info = Teal
-	Warn = Yellow
-	Fata = Red
+	Error = LogMessage(Red, '!')
+	Warn  = LogMessage(Teal, 'X')
+	Info  = LogMessage(Green, '*')
 )
 
 var (
@@ -19,10 +19,18 @@ var (
 	White   = Color("\033[1;37m%s\033[0m")
 )
 
+type Func func(args ...interface{}) string
+
 func Color(colorString string) func(...interface{}) string {
 	sprint := func(args ...interface{}) string {
 		return fmt.Sprintf(colorString,
 			fmt.Sprint(args...))
 	}
 	return sprint
+}
+
+func LogMessage(color func(...interface{}) string, symbol rune) func(string, ...interface{}) {
+	return func(message string, args ...interface{}) {
+		fmt.Printf(color("[%c] %s\n"), symbol, fmt.Sprintf(message, args...))
+	}
 }

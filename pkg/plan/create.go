@@ -1,4 +1,4 @@
-package create
+package plan
 
 import (
 	"flag"
@@ -54,6 +54,7 @@ func (steps Steps) Execute(name string) (err error) {
 
 type Step struct {
 	Command      string
+	Function     interface{}
 	Precondition string
 	Check        bool
 	Gate         func() bool
@@ -77,15 +78,20 @@ var UpdateStep = Step{
 		touch go.sum
 		rm -f go.sum
 		go clean -modcache
-		sed -i "s/^.*github.com\/sheik\/create.*$//g" go.mod
+		sed -i "s/^.*github.com\/sheik\/plan.*$//g" go.mod
 		go mod tidy
 		go mod vendor
-		go install github.com/sheik/create/cmd/create@latest
+		go install github.com/sheik/plan/cmd/plan@latest
 		`,
-	Help: "update create",
+	Help: "update plan",
 }
 
-func (steps Steps) PrintHelp() {
+var HelpStep = Step{
+	Function: Steps.PrintHelp,
+	Help:     "print help message for createfile",
+}
+
+func (steps Steps) PrintHelp(args ...interface{}) error {
 	var items []string
 	for name, _ := range steps {
 		items = append(items, name)
@@ -94,25 +100,35 @@ func (steps Steps) PrintHelp() {
 	for _, item := range items {
 		fmt.Printf("%30s : %s\n", color.Green(item), steps[item].Help)
 	}
+	return nil
 }
 
-func Plan(steps Steps) {
+func Run(steps Steps) {
+	var err error
 	flag.Parse()
+
+	// populate Steps map with auto targets
 	steps["update"] = UpdateStep
-	if len(flag.Args()) > 0 {
-		target := flag.Arg(0)
-		if target == "help" {
-			steps.PrintHelp()
-			return
+	steps["help"] = HelpStep
+
+	target := flag.Arg(0)
+	if target == "" {
+		if target, err = steps.DefaultTarget(); err != nil {
+			color.Error(err.Error())
+			os.Exit(3)
 		}
-		steps.ProcessTarget(target)
-		return
 	}
+	steps.ProcessTarget(target)
+	os.Exit(0)
+}
+
+func (steps Steps) DefaultTarget() (string, error) {
 	for target, step := range steps {
 		if step.Default {
-			steps.ProcessTarget(target)
+			return target, nil
 		}
 	}
+	return "", fmt.Errorf("no default target found in createfile")
 }
 
 func (steps Steps) ProcessTarget(name string) {
@@ -133,7 +149,7 @@ func (steps Steps) ProcessTarget(name string) {
 		err = shell.Exec(step.Precondition)
 		if err != nil {
 			preconditionFailed = true
-			fmt.Printf(color.Teal("[X] failed precondition for %s\n"), name)
+			fmt.Printf(color.Red("[!] failed precondition for %s\n"), name)
 			os.Exit(1)
 		}
 	}

@@ -15,7 +15,7 @@ func Output(cmdline string) string {
 func Exec(cmdline string) error {
 	var cmd *exec.Cmd
 	if strings.Contains(cmdline, "\n") {
-		file, err := os.CreateTemp("/tmp", "create-script")
+		file, err := os.CreateTemp("/tmp", "plan-script")
 		if err != nil {
 			return err
 		}
