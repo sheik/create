@@ -6,7 +6,6 @@ import (
 	"github.com/sheik/create/pkg/color"
 	"github.com/sheik/create/pkg/shell"
 	"os"
-	"os/exec"
 	"path"
 	"reflect"
 	"runtime"
@@ -17,15 +16,6 @@ import (
 var (
 	verbose = flag.Bool("v", false, "more verbose output")
 )
-
-func Output(cmdline string) string {
-	flag.Parse()
-	if *verbose {
-		fmt.Println("evaluating: " + cmdline)
-	}
-	outBytes, _ := exec.Command("/bin/bash", "-c", cmdline).Output()
-	return strings.TrimSuffix(string(outBytes), "\n")
-}
 
 func (steps Steps) Execute(name string) (err error) {
 	if step, ok := steps[name]; ok {

@@ -1,9 +1,12 @@
 package git
 
-import "github.com/sheik/create/pkg/create"
+import (
+	"github.com/sheik/create/pkg/create"
+	"github.com/sheik/create/pkg/shell"
+)
 
 func RepoClean() bool {
-	return create.Command("git diff-index --quiet HEAD") == nil
+	return shell.Exec("git diff-index --quiet HEAD") == nil
 }
 
 func CurrentTag() string {

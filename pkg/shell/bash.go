@@ -7,6 +7,11 @@ import (
 	"strings"
 )
 
+func Output(cmdline string) string {
+	outBytes, _ := exec.Command("/bin/bash", "-c", cmdline).Output()
+	return strings.TrimSuffix(string(outBytes), "\n")
+}
+
 func Exec(cmdline string) error {
 	var cmd *exec.Cmd
 	if strings.Contains(cmdline, "\n") {
