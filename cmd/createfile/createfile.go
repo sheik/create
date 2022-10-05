@@ -15,6 +15,7 @@ var (
 	dockerInteractive = "docker run -h builder --rm -v $PWD:/code -it " + imageName
 	version           = create.Output("git describe --tags | sed 's/-/_/g'")
 	newVersion        = git.IncrementMinorVersion(version)
+	branch            = create.Output("git branch --show-current")
 	rpm               = fmt.Sprintf("%s-%s-1.x86_64.rpm", project, version)
 )
 
@@ -55,7 +56,7 @@ var steps = create.Steps{
 		Command: "git commit -a -m \":INPUT:\"",
 	},
 	"publish": create.Step{
-		Command: fmt.Sprintf("git tag %s ; git push ; git push origin %s", newVersion, newVersion),
+		Command: fmt.Sprintf("git tag %s ; git push --set-upstream origin %s; git push origin %s", newVersion, branch, newVersion),
 		Depends: create.Complete("commit"),
 	},
 	"shell": create.Step{
