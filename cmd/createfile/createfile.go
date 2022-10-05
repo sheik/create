@@ -42,14 +42,14 @@ var steps = create.Steps{
 		Depends: create.Complete("pull_build_image"),
 		Help:    "build the go binary",
 	},
-	"pre-package": create.Step{
+	"pre_package": create.Step{
 		Command: "rm -rf usr && mkdir -p usr/local/bin && cp create usr/local/bin",
 		Help:    "prepare dir structure for packaging",
 	},
 	"package": create.Step{
 		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", dockerRun, version),
 		Check:   shell.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
-		Depends: create.Complete("pull_build_image", "build", "pre-package"),
+		Depends: create.Complete("pull_build_image", "build", "pre_package"),
 		Help:    "create rpm",
 		Default: true,
 	},
