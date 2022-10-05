@@ -112,6 +112,7 @@ var UpdateStep = Step{
 		go mod vendor
 		go install github.com/sheik/create/cmd/create@latest
 		`,
+	Help: "update create",
 }
 
 func (steps Steps) PrintHelp() {
@@ -121,7 +122,7 @@ func (steps Steps) PrintHelp() {
 	}
 	sort.Strings(items)
 	for _, item := range items {
-		fmt.Println(color.Green(item), ":", steps[item].Help)
+		fmt.Printf("%30s : %s\n", color.Green(item), steps[item].Help)
 	}
 }
 

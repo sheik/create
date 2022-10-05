@@ -27,6 +27,7 @@ var steps = create.Steps{
 		Command: fmt.Sprintf("docker pull %s", imageName),
 		Check:   docker.ImageExists(imageName),
 		Fail:    "build_image",
+		Help:    "pull build image from docker registry",
 	},
 	"build_image": create.Step{
 		Command: fmt.Sprintf("docker build . -f builder/Dockerfile --tag %s", imageName),
@@ -53,10 +54,12 @@ var steps = create.Steps{
 	},
 	"commit": create.Step{
 		Command: "git commit -a -m \":INPUT:\"",
+		Help:    "create a git commit",
 	},
 	"publish": create.Step{
 		Command: fmt.Sprintf("git tag %s ; git push ; git push origin %s", newVersion, newVersion),
 		Depends: create.Complete("commit"),
+		Help:    "commit, tag, and push code to repo",
 	},
 	"shell": create.Step{
 		Command:     dockerInteractive + " /bin/bash",
