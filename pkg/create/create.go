@@ -150,6 +150,7 @@ func (steps Steps) ProcessTarget(name string) {
 	step := steps[name]
 	if strings.Contains(step.Command, ":INPUT:") {
 		step.Command = strings.ReplaceAll(step.Command, ":INPUT:", strings.Join(os.Args[2:], " "))
+		steps[name] = step
 	}
 	if step.Check && !step.executed {
 		fmt.Println(color.Purple("[-] skipping ", name))
