@@ -26,8 +26,9 @@ var steps = create.Steps{
 	"pull_build_image": create.Step{
 		Command: fmt.Sprintf("docker pull %s", imageName),
 		Check:   docker.ImageExists(imageName),
+		Fail:    "build_image",
 	},
-	"build_container": create.Step{
+	"build_image": create.Step{
 		Command: fmt.Sprintf("docker build . -f builder/Dockerfile --tag %s", imageName),
 		Check:   docker.ImageExists(imageName),
 		Help:    "create the docker container used for building",
@@ -36,7 +37,7 @@ var steps = create.Steps{
 		Command: dockerRun + " go build ./cmd/create",
 		Gate:    git.RepoClean,
 		Check:   create.Bash("stat create &>/dev/null"),
-		Depends: create.Complete("build_container"),
+		Depends: create.Complete("pull_build_image"),
 		Help:    "build the go binary",
 	},
 	"tag": create.Step{
@@ -50,17 +51,17 @@ var steps = create.Steps{
 	"package": create.Step{
 		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", dockerRun, version),
 		Check:   create.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
-		Depends: create.Complete("build_container", "build", "pre-package"),
+		Depends: create.Complete("pull_build_image", "build", "pre-package"),
 		Help:    "create rpm",
 		Default: true,
 	},
 	"commit": create.Step{
-		Command: "git commit -a -m \"$@\"",
+		Command: "git commit -a -m \":INPUT:\"",
 	},
 	"shell": create.Step{
 		Command:     dockerInteractive + " /bin/bash",
 		Interactive: true,
-		Depends:     create.Complete("build_container"),
+		Depends:     create.Complete("pull_build_image"),
 		Help:        "open a shell in the build container",
 	},
 }
