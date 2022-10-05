@@ -134,6 +134,7 @@ func (steps Steps) ProcessTarget(name string) {
 		if err != nil {
 			preconditionFailed = true
 			fmt.Printf(color.Teal("[X] failed precondition for %s\n"), name)
+			os.Exit(1)
 		}
 	}
 	if !preconditionFailed {
@@ -146,6 +147,7 @@ func (steps Steps) ProcessTarget(name string) {
 		}
 		if err != nil {
 			fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), name, err)
+			os.Exit(2)
 		}
 	}
 }
