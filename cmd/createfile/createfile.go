@@ -58,6 +58,10 @@ var steps = create.Steps{
 	"commit": create.Step{
 		Command: "git commit -a -m \":INPUT:\"",
 	},
+	"publish": create.Step{
+		Command: "git push",
+		Depends: create.Complete("commit", "tag"),
+	},
 	"shell": create.Step{
 		Command:     dockerInteractive + " /bin/bash",
 		Interactive: true,

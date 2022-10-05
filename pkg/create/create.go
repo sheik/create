@@ -148,6 +148,9 @@ func (steps Steps) ProcessTarget(name string) {
 	var err error
 	preconditionFailed := false
 	step := steps[name]
+	if strings.Contains(step.Command, ":INPUT:") {
+		step.Command = strings.Replace(step.Command, ":INPUT:", strings.Join(os.Args[2:], " "), -1)
+	}
 	if step.Check && !step.executed {
 		fmt.Println(color.Purple("[-] skipping ", name))
 		step.executed = true
