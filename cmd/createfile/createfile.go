@@ -23,6 +23,10 @@ var steps = create.Steps{
 		Command: "rm -rf create *.rpm usr Createfile",
 		Help:    "clean build artifacts from repo",
 	},
+	"pull_build_image": create.Step{
+		Command: fmt.Sprintf("docker pull %s", imageName),
+		Check:   docker.ImageExists(imageName),
+	},
 	"build_container": create.Step{
 		Command: fmt.Sprintf("docker build . -f builder/Dockerfile --tag %s", imageName),
 		Check:   docker.ImageExists(imageName),
