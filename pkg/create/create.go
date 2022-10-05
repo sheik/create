@@ -110,7 +110,7 @@ var UpdateStep = Step{
 		sed -i "s/^.*github.com\/sheik\/create.*$//g" go.mod
 		go mod tidy
 		go mod vendor
-		go install github.com/sheik/create/cmd/create@update
+		go install github.com/sheik/create/cmd/create@latest
 		`,
 	Help: "update create",
 }
