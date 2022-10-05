@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	project           = "plan"
+	project           = "create"
 	buildVersion      = shell.Output("grep VERSION builder/Dockerfile | cut -d'=' -f2")
 	imageName         = "builder:" + buildVersion
 	dockerRun         = "docker run -h builder --rm -v $PWD:/code " + imageName
@@ -21,7 +21,7 @@ var (
 
 var steps = plan.Steps{
 	"clean": plan.Step{
-		Command: "rm -rf plan *.rpm usr Createfile",
+		Command: "rm -rf create *.rpm usr Createfile",
 		Help:    "clean build artifacts from repo",
 	},
 	"pull_build_image": plan.Step{
@@ -33,29 +33,29 @@ var steps = plan.Steps{
 	"build_image": plan.Step{
 		Command: fmt.Sprintf("docker build . -f builder/Dockerfile --tag %s", imageName),
 		Check:   docker.ImageExists(imageName),
-		Help:    "plan the docker container used for building",
+		Help:    "create the docker container used for building",
 	},
 	"build": plan.Step{
 		Command: dockerRun + " go build ./cmd/createfile",
-		Gate:    git.RepoClean,
-		Check:   shell.Bash("stat plan &>/dev/null"),
+		Gate:    git.RepoClean(),
+		Check:   shell.Bash("stat create &>/dev/null"),
 		Depends: plan.Complete("pull_build_image"),
 		Help:    "build the go binary",
 	},
 	"pre_package": plan.Step{
-		Command: "rm -rf usr && mkdir -p usr/local/bin && cp plan usr/local/bin",
+		Command: "rm -rf usr && mkdir -p usr/local/bin && cp create usr/local/bin",
 		Help:    "prepare dir structure for packaging",
 	},
 	"package": plan.Step{
-		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n plan usr", dockerRun, version),
+		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", dockerRun, version),
 		Check:   shell.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
 		Depends: plan.Complete("pull_build_image", "build", "pre_package"),
-		Help:    "plan rpm",
+		Help:    "create rpm",
 		Default: true,
 	},
 	"commit": plan.Step{
 		Command: "git commit -a -m \":INPUT:\"",
-		Help:    "plan a git commit",
+		Help:    "create a git commit",
 	},
 	"publish": plan.Step{
 		Command: fmt.Sprintf("git tag %s ; git push ; git push origin %s", newVersion, newVersion),

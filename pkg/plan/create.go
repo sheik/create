@@ -6,9 +6,6 @@ import (
 	"github.com/sheik/create/pkg/color"
 	"github.com/sheik/create/pkg/shell"
 	"os"
-	"path"
-	"reflect"
-	"runtime"
 	"sort"
 	"strings"
 )
@@ -19,8 +16,11 @@ var (
 
 func (steps Steps) Execute(name string) (err error) {
 	if step, ok := steps[name]; ok {
-		if step.Gate != nil && !step.Gate() {
-			err = fmt.Errorf("target \"%s\" did not pass gate: %s", name, path.Base(runtime.FuncForPC(reflect.ValueOf(step.Gate).Pointer()).Name()))
+		if step.Gate != nil {
+			err = fmt.Errorf("target \"%s\" did not pass gate: %s",
+				name,
+				step.Gate.Error(),
+			)
 			return
 		}
 
@@ -34,6 +34,9 @@ func (steps Steps) Execute(name string) (err error) {
 			fmt.Println(color.Green("[*] executing ", name))
 			if *verbose {
 				fmt.Println(step.Command)
+			}
+			if step.Function != nil {
+
 			}
 			if step.Interactive {
 				err = shell.InteractiveCommand(step.Command)
@@ -57,7 +60,7 @@ type Step struct {
 	Function     interface{}
 	Precondition string
 	Check        bool
-	Gate         func() bool
+	Gate         error
 	Fail         string
 	Help         string
 	Depends      []string

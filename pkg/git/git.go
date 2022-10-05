@@ -1,11 +1,16 @@
 package git
 
 import (
+	"errors"
 	"github.com/sheik/create/pkg/shell"
 )
 
-func RepoClean() bool {
-	return shell.Exec("git diff-index --quiet HEAD") == nil
+func RepoClean(args ...interface{}) error {
+	err := shell.Exec("git diff-index --quiet HEAD")
+	if err != nil {
+		return errors.New("git.RepoClean: git repository is dirty, commit and try again")
+	}
+	return nil
 }
 
 func CurrentTag() string {
