@@ -36,7 +36,7 @@ var steps = plan.Steps{
 		Help:    "create the docker container used for building",
 	},
 	"build": plan.Step{
-		Command: dockerRun + " go build ./cmd/createfile",
+		Command: dockerRun + " go build ./cmd/create",
 		Gate:    git.RepoClean(),
 		Check:   shell.Bash("stat create &>/dev/null"),
 		Depends: plan.Complete("pull_build_image"),
