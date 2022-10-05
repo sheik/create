@@ -1,7 +1,6 @@
 package git
 
 import (
-	"github.com/sheik/create/pkg/create"
 	"github.com/sheik/create/pkg/shell"
 )
 
@@ -10,5 +9,5 @@ func RepoClean() bool {
 }
 
 func CurrentTag() string {
-	return create.Output("git describe --tags | sed 's/-/_/g'")
+	return shell.Output("git describe --tags | sed 's/-/_/g'")
 }
