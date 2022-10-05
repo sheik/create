@@ -59,7 +59,7 @@ var steps = create.Steps{
 		Command: "git commit -a -m \":INPUT:\"",
 	},
 	"publish": create.Step{
-		Command: "git push origin master",
+		Command: "git push " + newVersion,
 		Depends: create.Complete("commit", "tag"),
 	},
 	"shell": create.Step{
