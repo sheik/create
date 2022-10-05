@@ -40,10 +40,6 @@ var steps = create.Steps{
 		Depends: create.Complete("pull_build_image"),
 		Help:    "build the go binary",
 	},
-	"tag": create.Step{
-		Command: fmt.Sprintf("git tag %s ; git push origin %s", newVersion, newVersion),
-		Help:    "create a new minor tag and push",
-	},
 	"pre-package": create.Step{
 		Command: "rm -rf usr && mkdir -p usr/local/bin && cp create usr/local/bin",
 		Help:    "prepare dir structure for packaging",
@@ -59,8 +55,8 @@ var steps = create.Steps{
 		Command: "git commit -a -m \":INPUT:\"",
 	},
 	"publish": create.Step{
-		Command: "git push origin " + newVersion,
-		Depends: create.Complete("commit", "tag"),
+		Command: fmt.Sprintf("git tag %s ; git push origin %s", newVersion, newVersion),
+		Depends: create.Complete("commit"),
 	},
 	"shell": create.Step{
 		Command:     dockerInteractive + " /bin/bash",
