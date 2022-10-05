@@ -55,7 +55,7 @@ var steps = create.Steps{
 		Command: "git commit -a -m \":INPUT:\"",
 	},
 	"publish": create.Step{
-		Command: fmt.Sprintf("git tag %s ; git push origin %s", newVersion, newVersion),
+		Command: fmt.Sprintf("git tag %s ; git push ; git push origin %s", newVersion, newVersion),
 		Depends: create.Complete("commit"),
 	},
 	"shell": create.Step{
