@@ -46,11 +46,12 @@ var steps = plan.Steps{
 	},
 	"pre_package": plan.Step{
 		Command: "rm -rf usr && mkdir -p usr/local/bin && cp create usr/local/bin",
+		Depends: plan.Complete("build"),
 	},
 	"package": plan.Step{
 		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", dockerRun, version),
 		Check:   shell.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
-		Depends: plan.Complete("pull_build_image", "build", "pre_package"),
+		Depends: plan.Complete("pre_package"),
 		Help:    "create rpm",
 		Default: true,
 	},

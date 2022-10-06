@@ -3,7 +3,7 @@ package plan
 import (
 	"flag"
 	"fmt"
-	"github.com/sheik/create/pkg/color"
+	"github.com/sheik/create/pkg/log"
 	"github.com/sheik/create/pkg/shell"
 	"os"
 	"sort"
@@ -31,7 +31,7 @@ func (steps Steps) Execute(name string) (err error) {
 		}
 
 		if !step.executed {
-			fmt.Println(color.Green("[*] executing ", name))
+			log.Info("executing %s", name)
 			if *verbose {
 				fmt.Println(step.Command)
 			}
@@ -109,7 +109,7 @@ func (steps Steps) PrintHelp(args ...interface{}) error {
 	sort.Strings(items)
 	for _, item := range items {
 		if steps[item].Help != "" {
-			fmt.Printf("%30s : %s\n", color.Green(item), steps[item].Help)
+			fmt.Printf("%30s : %s\n", log.Green(item), steps[item].Help)
 		}
 	}
 	return nil
@@ -127,7 +127,7 @@ func Run(steps Steps) {
 	target := flag.Arg(0)
 	if target == "" {
 		if target, err = steps.DefaultTarget(); err != nil {
-			color.Error(err.Error())
+			log.Error(err.Error())
 			os.Exit(3)
 		}
 	}
@@ -153,7 +153,7 @@ func (steps Steps) ProcessTarget(name string) {
 		steps[name] = step
 	}
 	if step.Check && !step.executed {
-		fmt.Println(color.Purple("[-] skipping ", name))
+		log.Warn("skipping %s", name)
 		step.executed = true
 		steps[name] = step
 		return
@@ -162,7 +162,7 @@ func (steps Steps) ProcessTarget(name string) {
 		err = shell.Exec(step.Precondition)
 		if err != nil {
 			preconditionFailed = true
-			fmt.Printf(color.Red("[!] failed precondition for %s\n"), name)
+			log.Error("failed precondition for %s", name)
 			os.Exit(1)
 		}
 	}
@@ -171,11 +171,11 @@ func (steps Steps) ProcessTarget(name string) {
 	}
 	if err != nil || preconditionFailed {
 		if step.Fail != "" {
-			fmt.Printf(color.Teal("[X] error running target \"%s\": failing over to %s\n"), name, step.Fail)
+			log.Warn("error running target \"%s\": failing over to \"%s\"", name, step.Fail)
 			err = steps.Execute(step.Fail)
 		}
 		if err != nil {
-			fmt.Printf(color.Red("[!] error running target \"%s\": %s\n"), name, err)
+			log.Error("error running target \"%s\": %s", name, err)
 			os.Exit(2)
 		}
 	}
