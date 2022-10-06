@@ -7,11 +7,11 @@ import (
 
 type ImageObj struct {
 	Name  string
-	Inter bool
+	Flags string
 }
 
-func Image(name string) ImageObj {
-	return ImageObj{
+func Image(name string) *ImageObj {
+	return &ImageObj{
 		Name: name,
 	}
 }
@@ -29,15 +29,16 @@ func Pull(image string) bool {
 }
 
 func (image *ImageObj) Interactive() *ImageObj {
-	image.Inter = true
+	image.Flags += " -it "
+	return image
+}
+
+func (image *ImageObj) Mount(source, dest string) *ImageObj {
+	image.Flags += fmt.Sprintf("-v %s:%s", source, dest)
 	return image
 }
 
 func (image *ImageObj) Run(formatString string, args ...interface{}) string {
-	var flags string
-	if image.Inter {
-		flags = "-it"
-	}
 	dockerCommand := fmt.Sprintf(formatString, args...)
-	return fmt.Sprintf("docker run %s --rm -v $PWD:/code %s %s", flags, image.Name, dockerCommand)
+	return fmt.Sprintf("docker run %s --rm -v $PWD:/code %s %s", image.Flags, image.Name, dockerCommand)
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/sheik/create/pkg/build"
 	"github.com/sheik/create/pkg/docker"
 	"github.com/sheik/create/pkg/git"
 	"github.com/sheik/create/pkg/plan"
@@ -14,8 +15,8 @@ var (
 	imageName    = "builder:" + buildVersion
 	version      = shell.Output("git describe --tags | sed 's/-/_/g'")
 	newVersion   = git.IncrementMinorVersion(version)
-	rpm          = fmt.Sprintf("%s-%s-1.x86_64.rpm", project, version)
-	builder      = docker.Image(imageName)
+	rpm          = build.RPM(project, version)
+	builder      = docker.Image(imageName).Mount("$PWD", "/code")
 )
 
 var steps = plan.Steps{
