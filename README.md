@@ -7,7 +7,7 @@ In order to use create, first go into your project directory (with go module set
     go install github.com/sheik/create/cmd/create@latest
     create update 
 
-Next, you need to make a "createfile". In order to do this, you need to create a package called "createfile" under your "cmd" directory in your project. For example:
+Next, you need to make a "createfile". In order to do this, you need to create a package called "createfile" under your "cmd" directory in your project (for details on the "cmd" directory, see [Standard Go Project Layout](https://github.com/golang-standards/project-layout). For example:
 
 	.
 	├── cmd
