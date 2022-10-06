@@ -1,7 +1,8 @@
 .PHONY: default install
 
-default: package
+default:
+	@go install github.com/sheik/create/cmd/create@latest
+	@$(MAKE) -s package
 
 %:
-	@go install ./cmd/create
 	@create $@
