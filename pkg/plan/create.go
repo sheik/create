@@ -81,13 +81,18 @@ func Complete(args ...string) []string {
 var UpdateStep = Step{
 	Command: `
 		export GOPRIVATE=github.com
+		go install github.com/sheik/create/cmd/create@latest
 		touch go.sum
 		rm -f go.sum
 		go clean -modcache
-		sed -i "s/^.*github.com\/sheik\/create.*$//g" go.mod
 		go mod tidy
+		go get -u github.com/sheik/create/pkg/build
+		go get -u github.com/sheik/create/pkg/docker
+		go get -u github.com/sheik/create/pkg/git
+		go get -u github.com/sheik/create/pkg/plan
+		go get -u github.com/sheik/create/pkg/shell
+		go get -u github.com/sheik/create/pkg/util
 		go mod vendor
-		go install github.com/sheik/create/cmd/create@latest
 		`,
 	Help: "update create",
 }
