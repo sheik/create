@@ -1,13 +1,5 @@
 github.com/creack/pty v1.1.18 h1:n56/Zwd5o6whRC5PMGretI4IdRLlmBXYNjScPaBgsbY=
 github.com/creack/pty v1.1.18/go.mod h1:MOBLtS5ELjhRRrroQr9kyvTxUAFNvYEK993ew/Vr4O4=
-github.com/pointlander/compress v1.1.1-0.20190518213731-ff44bd196cc3 h1:hUmXhbljNFtrH5hzV9kiRoddZ5nfPTq3K0Sb2hYYiqE=
-github.com/pointlander/compress v1.1.1-0.20190518213731-ff44bd196cc3/go.mod h1:q5NXNGzqj5uPnVuhGkZfmgHqNUhf15VLi6L9kW0VEc0=
-github.com/pointlander/compress v1.1.1-0.20210112171536-f1390ed9e1af h1:gB9iuFZOD8OCJRHVT8mv9zl0Omrg2A1kCVxTrANWWPo=
-github.com/pointlander/compress v1.1.1-0.20210112171536-f1390ed9e1af/go.mod h1:knL5MVK1bDuI0YLbILQ2vHc92jcnoFbcUveNyHmc82E=
-github.com/pointlander/jetset v1.0.1-0.20190518214125-eee7eff80bd4 h1:RHHRCZeaNyBXdYPMjZNH8/XHDBH38TZzw8izrW7dmBE=
-github.com/pointlander/jetset v1.0.1-0.20190518214125-eee7eff80bd4/go.mod h1:RdR1j20Aj5pB6+fw6Y9Ur7lMHpegTEjY1vc19hEZL40=
-github.com/pointlander/peg v1.0.1 h1:mgA/GQE8TeS9MdkU6Xn6iEzBmQUQCNuWD7rHCK6Mjs0=
-github.com/pointlander/peg v1.0.1/go.mod h1:5hsGDQR2oZI4QoWz0/Kdg3VSVEC31iJw/b7WjqCBGRI=
 golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec h1:BkDtF2Ih9xZ7le9ndzTA7KJow28VbQW3odyk/8drmuI=
 golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20220919170432-7a66f970e087 h1:tPwmk4vmvVCMdr98VgL4JH+qZxPL8fqlUOHnyOM8N3w=

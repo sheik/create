@@ -8,12 +8,20 @@ In order to use create, first you need to install create:
 
 Next, you need to make a "createfile". In order to do this, you need to create a package called "createfile" under your "cmd" directory in your project. For example:
 
-    cmd
-    ├── create
-    │   └── main.go
-    └── createfile
-        └── createfile.go
-
+	.
+	├── cmd
+	│   ├── createfile
+	│   │   └── createfile.go
+	│   └── myproject
+	│       └── main.go
+	├── go.mod
+	├── go.sum
+	├── internal
+	│   └── utils
+	│       └── utils.go
+	└── pkg
+	    └── shell
+		└── shell.go
 
 
 ## Building ##

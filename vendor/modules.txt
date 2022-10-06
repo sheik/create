@@ -1,12 +1,6 @@
 # github.com/creack/pty v1.1.18
 ## explicit; go 1.13
 github.com/creack/pty
-# github.com/pointlander/compress v1.1.1-0.20210112171536-f1390ed9e1af
-## explicit; go 1.13
-# github.com/pointlander/jetset v1.0.1-0.20190518214125-eee7eff80bd4
-## explicit
-# github.com/pointlander/peg v1.0.1
-## explicit; go 1.13
 # golang.org/x/sys v0.0.0-20220928140112-f11e5e49a4ec
 ## explicit; go 1.17
 golang.org/x/sys/internal/unsafeheader
