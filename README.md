@@ -36,4 +36,4 @@ Once you have installed "create" into your project and created a createfile, bui
 You can run it without specifying a target, in which case it will run whichever target has "Default" set to "true".
 
 ## License ##
-This project is licensed under the terms of the MIT license. See LICENSE.md for details.
+This project is licensed under the terms of the MIT license. See [LICENSE.md](https://github.com/sheik/create/blob/main/LICENSE.md) for details.
