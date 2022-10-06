@@ -2,12 +2,14 @@ package log
 
 import "fmt"
 
+// Basic log levels
 var (
-	Error = Message(Red, '!')
-	Warn  = Message(Teal, 'X')
-	Info  = Message(Green, '*')
+	Error = message(Red, '!')
+	Warn  = message(Teal, 'X')
+	Info  = message(Green, '*')
 )
 
+// Declare all the ANSI colors
 var (
 	Black   = color("\033[1;30m%s\033[0m")
 	Red     = color("\033[1;31m%s\033[0m")
@@ -19,8 +21,20 @@ var (
 	White   = color("\033[1;37m%s\033[0m")
 )
 
-type Func func(args ...interface{}) string
-
+// color returns a function that can be used to create a function
+// that can be used with Printf or Sprintf to produce colored output (ANSI).
+// This is done by wrapping the format string. For example, if you want to turn
+// some text green, you can do something like:
+//
+//	fmt.Println(log.Green("This message will be green: %s"), "woohoo!")
+//
+// or, more generally, if you want to write an Info, Warn, or Error message:
+//
+//	log.Info("this is a log message: %s", val)
+//	log.Warn("this is a warning message: %s", val)
+//	log.Error("this is an error message: %s", val)
+//
+// These functions are defined at the top of the file in variable declarations
 func color(colorString string) func(...interface{}) string {
 	sprint := func(args ...interface{}) string {
 		return fmt.Sprintf(colorString,
@@ -29,7 +43,9 @@ func color(colorString string) func(...interface{}) string {
 	return sprint
 }
 
-func Message(colorFunc func(...interface{}) string, symbol rune) func(string, ...interface{}) {
+// message is used to create various ANSI colors. See the variable declarations
+// at the top of the file.
+func message(colorFunc func(...interface{}) string, symbol rune) func(string, ...interface{}) {
 	return func(message string, args ...interface{}) {
 		fmt.Printf(colorFunc("[%c] %s\n"), symbol, fmt.Sprintf(message, args...))
 	}
