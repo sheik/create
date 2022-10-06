@@ -21,7 +21,7 @@ var (
 
 var steps = plan.Steps{
 	"clean": plan.Step{
-		Command: "rm -rf create *.rpm usr Createfile",
+		Command: "rm -rf create *.rpm usr createfile.go pkg/parser/*.go",
 		Help:    "clean build artifacts from repo",
 	},
 	"pull_build_image": plan.Step{
@@ -36,7 +36,7 @@ var steps = plan.Steps{
 		Help:    "create the docker container used for building",
 	},
 	"gen_parser": plan.Step{
-		Command: "peg -noast -switch -inline -strict -output pkg/parser/parser.go Createfile.peg",
+		Command: "peg -noast -switch -inline -strict -output pkg/parser/parser.go createfile.peg",
 	},
 	"build": plan.Step{
 		Command: dockerRun + " go build ./cmd/create",
