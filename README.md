@@ -28,7 +28,7 @@ Next, you need to make a "createfile". In order to do this, you need to create a
 ## Example Createfile ##
 See an [example here](https://github.com/sheik/create/blob/main/cmd/createfile/createfile.go)
 
-## Building ##
+## Building Your Project ##
 Once you have installed "create" into your project and created a createfile, building your is as simple as running:
 
     user@host:/home/user/myProject$ create <target>
