@@ -10,9 +10,9 @@ Next, you need to make a "createfile". In order to do this, you need to create a
 
     cmd
     ├── create
-    │   └── main.go
+    │   └── main.go
     └── createfile
-    └── createfile.go
+        └── createfile.go
 
 
 
