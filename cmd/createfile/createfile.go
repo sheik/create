@@ -35,11 +35,13 @@ var steps = plan.Steps{
 		Check:   docker.ImageExists(imageName),
 		Help:    "create the docker container used for building",
 	},
+	"gen_parser": plan.Step{
+		Command: "peg -noast -switch -inline -strict -output Createfile.go Createfile.peg",
+	},
 	"build": plan.Step{
 		Command: dockerRun + " go build ./cmd/create",
-		Gate:    git.RepoClean(),
 		Check:   shell.Bash("stat create &>/dev/null"),
-		Depends: plan.Complete("pull_build_image"),
+		Depends: plan.Complete("pull_build_image", "gen_parser"),
 		Help:    "build the go binary",
 	},
 	"pre_package": plan.Step{
@@ -58,7 +60,7 @@ var steps = plan.Steps{
 	},
 	"publish": plan.Step{
 		Command: fmt.Sprintf("git tag %s ; git push ; git push origin %s", newVersion, newVersion),
-		Depends: plan.Complete("commit"),
+		Gate:    git.RepoClean(),
 		Help:    "commit, tag, and push code to repo",
 	},
 	"shell": plan.Step{

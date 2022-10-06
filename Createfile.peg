@@ -1,0 +1,58 @@
+package main
+
+type Createfile Peg {
+    AssignmentExpression
+}
+
+Expr <- AssignmentExpression
+
+#-------------------------------------------------------------------------
+# Spacing and Comments
+#-------------------------------------------------------------------------
+
+Spacing
+   <- ( WhiteSpace
+      / LongComment
+      / LineComment
+      / Pragma
+      )*
+
+WhiteSpace  <- [ \n\r\t]             # 7.4.1.10 [\u000B\u000C]
+
+LongComment <- '/*' (!'*/'.)* '*/'   # 6.4.9
+
+LineComment <- '//' (!'\n' .)*       # 6.4.9
+
+Pragma      <- '#'  (!'\n' .)*       # Treat pragma as comment
+
+AssignmentExpression
+   <- UnaryExpression AssignmentOperator AssignmentExpression
+
+AssignmentOperator
+    <- EQU
+
+UnaryExpression
+    <- Identifier
+
+Identifier <- !Keyword IdNondigit IdChar* Spacing #{}
+
+IdNondigit
+   <- [a-z] / [A-Z] / [_]
+    / UniversalCharacter
+
+IdChar
+   <- [a-z] / [A-Z] / [0-9] / [_]
+    / UniversalCharacter
+
+Keyword <- ( 'shell'
+           )
+
+EQU <- '='  ![=] Spacing
+
+UniversalCharacter
+   <- '\\u' HexQuad
+    / '\\U' HexQuad HexQuad
+
+HexQuad <- HexDigit HexDigit HexDigit HexDigit
+
+HexDigit        <- [a-f] / [A-F] / [0-9]
