@@ -84,12 +84,12 @@ var UpdateStep = Step{
 		touch go.sum
 		rm -f go.sum
 		go clean -modcache
-		sed -i "s/^.*github.com\/sheik\/plan.*$//g" go.mod
+		sed -i "s/^.*github.com\/sheik\/create.*$//g" go.mod
 		go mod tidy
 		go mod vendor
-		go install github.com/sheik/plan/cmd/plan@latest
+		go install github.com/sheik/create/cmd/create@latest
 		`,
-	Help: "update plan",
+	Help: "update create",
 }
 
 var HelpStep = Step{
