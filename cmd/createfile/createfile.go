@@ -10,13 +10,12 @@ import (
 )
 
 var (
-	project      = "create"
-	buildVersion = shell.Output("grep VERSION builder/Dockerfile | cut -d'=' -f2")
-	imageName    = "builder:" + buildVersion
-	version      = shell.Output("git describe --tags | sed 's/-/_/g'")
-	newVersion   = git.IncrementMinorVersion(version)
-	rpm          = build.RPM(project, version)
-	builder      = docker.Image(imageName).Mount("$PWD", "/code")
+	project    = "create"
+	imageName  = "builder:" + shell.Output("grep VERSION builder/Dockerfile | cut -d'=' -f2")
+	version    = shell.Output("git describe --tags | sed 's/-/_/g'")
+	newVersion = git.IncrementMinorVersion(version)
+	rpm        = build.RPM(project, version)
+	builder    = docker.Image(imageName).Mount("$PWD", "/code")
 )
 
 var steps = plan.Steps{
@@ -37,6 +36,7 @@ var steps = plan.Steps{
 	},
 	"parser": plan.Step{
 		Command: "peg -noast -switch -inline -strict -output pkg/parser/parser.go grammar/createfile.peg",
+		Help:    "generate createfile parser from grammar file",
 	},
 	"build": plan.Step{
 		Command: builder.Run("go build ./cmd/create"),
