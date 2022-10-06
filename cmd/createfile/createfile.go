@@ -21,7 +21,7 @@ var (
 
 var steps = plan.Steps{
 	"clean": plan.Step{
-		Command: "rm -rf create *.rpm usr createfile.go pkg/parser/*.go",
+		Command: "rm -rf create *.rpm usr createfile.go",
 		Help:    "clean build artifacts from repo",
 	},
 	"pull_build_image": plan.Step{
@@ -35,13 +35,13 @@ var steps = plan.Steps{
 		Check:   docker.ImageExists(imageName),
 		Help:    "create the docker container used for building",
 	},
-	"gen_parser": plan.Step{
-		Command: "peg -noast -switch -inline -strict -output pkg/parser/parser.go createfile.peg",
+	"parser": plan.Step{
+		Command: "peg -noast -switch -inline -strict -output pkg/parser/parser.go grammar/createfile.peg",
 	},
 	"build": plan.Step{
 		Command: dockerRun + " go build ./cmd/create",
 		Check:   shell.Bash("stat create &>/dev/null"),
-		Depends: plan.Complete("pull_build_image", "gen_parser"),
+		Depends: plan.Complete("pull_build_image", "parser"),
 		Help:    "build the go binary",
 	},
 	"pre_package": plan.Step{
