@@ -1,5 +1,5 @@
 # Create #
-Create is a language agnostic build tool that allows you to define steps and depdencies.
+Create is a language agnostic build tool that allows you to define steps and dependencies.
 
 ## Using Create in Your Project ##
 In order to use create, first you need to install create:
