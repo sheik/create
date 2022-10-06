@@ -33,7 +33,7 @@ func Exec(cmdline string) error {
 	return cmd.Run()
 }
 
-func Bash(command string) bool {
+func ReturnZero(command string) bool {
 	cmd := fmt.Sprintf("bash -c \"%s\"", command)
 	return Exec(cmd) == nil
 }

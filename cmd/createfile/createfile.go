@@ -9,13 +9,14 @@ import (
 	"github.com/sheik/create/pkg/shell"
 )
 
+const project = "create"
+
 var (
-	project    = "create"
 	imageName  = "builder:" + shell.Output("grep VERSION builder/Dockerfile | cut -d'=' -f2")
-	version    = shell.Output("git describe --tags | sed 's/-/_/g'")
+	version    = git.GetVersion()
 	newVersion = git.IncrementMinorVersion(version)
-	rpm        = build.RPM(project, version)
-	builder    = docker.Image(imageName).Mount("$PWD", "/code")
+	rpm        = build.RPMFilename(project, version)
+	container  = docker.Container(imageName).Mount("$PWD", "/code")
 )
 
 var steps = plan.Steps{
@@ -39,8 +40,8 @@ var steps = plan.Steps{
 		Help:    "generate createfile parser from grammar file",
 	},
 	"build": plan.Step{
-		Command: builder.Run("go build ./cmd/create"),
-		Check:   shell.Bash("stat create &>/dev/null"),
+		Command: container.Run("go build ./cmd/create"),
+		Check:   shell.ReturnZero("stat create &>/dev/null"),
 		Depends: plan.Complete("pull_build_image", "parser"),
 		Help:    "build the go binary",
 	},
@@ -49,8 +50,8 @@ var steps = plan.Steps{
 		Depends: plan.Complete("build"),
 	},
 	"package": plan.Step{
-		Command: builder.Run("fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", version),
-		Check:   shell.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
+		Command: container.Run("fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", version),
+		Check:   shell.ReturnZero(fmt.Sprintf("stat %s &>/dev/null", rpm)),
 		Depends: plan.Complete("pre_package"),
 		Help:    "create rpm",
 		Default: true,
@@ -65,7 +66,7 @@ var steps = plan.Steps{
 		Help:    "commit, tag, and push code to repo",
 	},
 	"shell": plan.Step{
-		Command:     builder.Interactive().Run("/bin/bash"),
+		Command:     container.Interactive().Run("/bin/bash"),
 		Interactive: true,
 		Depends:     plan.Complete("pull_build_image"),
 		Help:        "open a shell in the build container",

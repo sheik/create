@@ -5,13 +5,13 @@ import (
 	"github.com/sheik/create/pkg/shell"
 )
 
-type ImageObj struct {
+type ContainerObj struct {
 	Name  string
 	Flags string
 }
 
-func Image(name string) *ImageObj {
-	return &ImageObj{
+func Container(name string) *ContainerObj {
+	return &ContainerObj{
 		Name: name,
 	}
 }
@@ -28,17 +28,17 @@ func Pull(image string) bool {
 	return shell.Exec(command) == nil
 }
 
-func (image *ImageObj) Interactive() *ImageObj {
+func (image *ContainerObj) Interactive() *ContainerObj {
 	image.Flags += " -it "
 	return image
 }
 
-func (image *ImageObj) Mount(source, dest string) *ImageObj {
+func (image *ContainerObj) Mount(source, dest string) *ContainerObj {
 	image.Flags += fmt.Sprintf("-v %s:%s", source, dest)
 	return image
 }
 
-func (image *ImageObj) Run(formatString string, args ...interface{}) string {
+func (image *ContainerObj) Run(formatString string, args ...interface{}) string {
 	dockerCommand := fmt.Sprintf(formatString, args...)
 	return fmt.Sprintf("docker run %s --rm -v $PWD:/code %s %s", image.Flags, image.Name, dockerCommand)
 }
