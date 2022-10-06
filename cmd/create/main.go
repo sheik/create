@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/sheik/create/pkg/plan"
 	"github.com/sheik/create/pkg/shell"
 	"os"
@@ -9,6 +10,24 @@ import (
 
 func main() {
 	var args string
+
+	p := Createfile{
+		Buffer: `
+		test = "test string";
+		test2--;
+		`,
+	}
+
+	p.Init()
+
+	err := p.Parse()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	p.Execute()
+	p.PrintSyntaxTree()
+	return
 	if len(os.Args) > 1 {
 		args = strings.Join(os.Args[1:], " ")
 		if os.Args[1] == "update" {

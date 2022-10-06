@@ -1,0 +1,191 @@
+package main
+
+type Createfile Peg {
+
+}
+
+Expression <- AssignmentExpression (COMMA AssignmentExpression)*
+
+#-------------------------------------------------------------------------
+#  Expressions
+#-------------------------------------------------------------------------
+PrimaryExpression
+   <- StringLiteral
+    / Constant
+    / Identifier
+    / LPAR Expression RPAR
+
+ArgumentExpressionList <- AssignmentExpression (COMMA AssignmentExpression)*
+
+UnaryExpression
+   <- PostfixExpression
+    / INC UnaryExpression
+    / DEC UnaryExpression
+
+PostfixExpression
+   <- ( PrimaryExpression
+      / LBRK Expression RBRK
+      / LPAR ArgumentExpressionList? RPAR
+      / INC
+      / DEC
+      )*
+
+#-------------------------------------------------------------------------
+# Spacing and Comments
+#-------------------------------------------------------------------------
+
+Spacing
+   <- ( WhiteSpace
+      / LongComment
+      / LineComment
+      / Pragma
+      )*
+
+WhiteSpace  <- [ \n\r\t]
+LongComment <- '/*' (!'*/'.)* '*/'
+LineComment <- '//' (!'\n' .)*
+Pragma      <- '#'  (!'\n' .)*
+
+#-------------------------------------------------------------------------
+# Hex
+#-------------------------------------------------------------------------
+
+HexQuad <- HexDigit HexDigit HexDigit HexDigit
+HexDigit <- [a-f] / [A-F] / [0-9]
+
+UniversalCharacter
+   <- '\\u' HexQuad
+    / '\\U' HexQuad HexQuad
+
+#-------------------------------------------------------------------------
+# Constants
+#-------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------
+#  A.1.5  Constants
+#-------------------------------------------------------------------------
+
+Constant
+   <- FloatConstant
+    / IntegerConstant       # Note: can be a prefix of Float Constant!
+    / EnumerationConstant
+    / CharacterConstant
+
+IntegerConstant
+   <- ( DecimalConstant
+      / HexConstant
+      / OctalConstant
+      )
+    IntegerSuffix? Spacing
+
+DecimalConstant <- [1-9][0-9]*
+OctalConstant   <- '0' [0-7]*
+HexConstant     <- HexPrefix HexDigit+
+HexPrefix       <- '0x' / '0X'
+HexDigit        <- [a-f] / [A-F] / [0-9]
+
+IntegerSuffix
+   <- [uU] Lsuffix?
+    / Lsuffix [uU]?
+
+Lsuffix
+   <- 'll'
+    / 'LL'
+    / [lL]
+
+FloatConstant
+   <- ( DecimalFloatConstant
+      / HexFloatConstant
+      )
+    FloatSuffix? Spacing
+
+DecimalFloatConstant
+   <- Fraction Exponent?
+    / [0-9]+ Exponent
+
+HexFloatConstant
+   <- HexPrefix HexFraction BinaryExponent?
+    / HexPrefix HexDigit+ BinaryExponent
+
+Fraction
+   <- [0-9]* '.' [0-9]+
+    / [0-9]+ '.'
+
+HexFraction
+   <- HexDigit* '.' HexDigit+
+    / HexDigit+ '.'
+
+Exponent <- [eE][+\-]? [0-9]+
+
+BinaryExponent <- [pP][+\-]? [0-9]+
+
+FloatSuffix <- [flFL]
+
+EnumerationConstant <- Identifier
+
+CharacterConstant <- 'L'? ['] Char* ['] Spacing
+
+Char <- Escape / !['\n\\] .
+
+Escape
+   <- SimpleEscape
+    / OctalEscape
+    / HexEscape
+    / UniversalCharacter
+
+SimpleEscape <- '\\' ['\"?\\%abfnrtv]
+OctalEscape  <- '\\' [0-7][0-7]?[0-7]?
+HexEscape    <- '\\x' HexDigit+
+
+#-------------------------------------------------------------------------
+# Assignment
+#-------------------------------------------------------------------------
+AssignmentExpression
+   <- UnaryExpression EQU AssignmentExpression
+
+Identifier <- !Keyword IdNondigit IdChar* Spacing
+
+IdNondigit
+   <- [a-z] / [A-Z] / [_]
+    / UniversalCharacter
+
+IdChar
+   <- [a-z] / [A-Z] / [0-9] / [_]
+   / UniversalCharacter
+
+Keyword
+   <- ( 'shell'
+      / 'output'
+      )
+    !IdChar
+
+#-------------------------------------------------------------------------
+#  String Literals
+#-------------------------------------------------------------------------
+
+StringLiteral <- 'L'? (["] StringChar* ["] Spacing)+
+
+StringChar <- Escape / ![\"\n\\] .
+
+#-------------------------------------------------------------------------
+#  Lexical Elements
+#-------------------------------------------------------------------------
+Spacing
+   <- WhiteSpace*
+
+WhiteSpace  <- [ \n\r\t]
+LineComment <- '//' (!'\n' .)*
+Pragma      <- '#'  (!'\n' .)*
+
+#-------------------------------------------------------------------------
+# Punctuators
+#-------------------------------------------------------------------------
+LPAR <- '(' Spacing
+RPAR <- ')' Spacing
+EQU <- '=' Spacing
+INC <- '++' Spacing
+DEC <- '--' Spacing
+LBRK <- '[' Spacing
+RBRK <- ']' Spacing
+COMMA <- ',' Spacing
+

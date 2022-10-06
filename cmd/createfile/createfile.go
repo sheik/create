@@ -36,7 +36,7 @@ var steps = plan.Steps{
 		Help:    "create the docker container used for building",
 	},
 	"parser": plan.Step{
-		Command: "peg -noast -switch -inline -strict -output cmd/create/parser.go grammar/createfile.peg",
+		Command: "peg -inline -switch -output cmd/create/parser.go grammar/createfile.peg",
 		Help:    "generate createfile parser from grammar file",
 	},
 	"build": plan.Step{
