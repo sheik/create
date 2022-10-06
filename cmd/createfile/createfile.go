@@ -9,14 +9,13 @@ import (
 )
 
 var (
-	project           = "create"
-	buildVersion      = shell.Output("grep VERSION builder/Dockerfile | cut -d'=' -f2")
-	imageName         = "builder:" + buildVersion
-	dockerRun         = "docker run -h builder --rm -v $PWD:/code " + imageName
-	dockerInteractive = "docker run -h builder --rm -v $PWD:/code -it " + imageName
-	version           = shell.Output("git describe --tags | sed 's/-/_/g'")
-	newVersion        = git.IncrementMinorVersion(version)
-	rpm               = fmt.Sprintf("%s-%s-1.x86_64.rpm", project, version)
+	project      = "create"
+	buildVersion = shell.Output("grep VERSION builder/Dockerfile | cut -d'=' -f2")
+	imageName    = "builder:" + buildVersion
+	version      = shell.Output("git describe --tags | sed 's/-/_/g'")
+	newVersion   = git.IncrementMinorVersion(version)
+	rpm          = fmt.Sprintf("%s-%s-1.x86_64.rpm", project, version)
+	builder      = docker.Image(imageName)
 )
 
 var steps = plan.Steps{
@@ -39,7 +38,7 @@ var steps = plan.Steps{
 		Command: "peg -noast -switch -inline -strict -output pkg/parser/parser.go grammar/createfile.peg",
 	},
 	"build": plan.Step{
-		Command: dockerRun + " go build ./cmd/create",
+		Command: builder.Run("go build ./cmd/create"),
 		Check:   shell.Bash("stat create &>/dev/null"),
 		Depends: plan.Complete("pull_build_image", "parser"),
 		Help:    "build the go binary",
@@ -49,7 +48,7 @@ var steps = plan.Steps{
 		Depends: plan.Complete("build"),
 	},
 	"package": plan.Step{
-		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", dockerRun, version),
+		Command: builder.Run("fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", version),
 		Check:   shell.Bash(fmt.Sprintf("stat %s &>/dev/null", rpm)),
 		Depends: plan.Complete("pre_package"),
 		Help:    "create rpm",
@@ -65,7 +64,7 @@ var steps = plan.Steps{
 		Help:    "commit, tag, and push code to repo",
 	},
 	"shell": plan.Step{
-		Command:     dockerInteractive + " /bin/bash",
+		Command:     builder.Interactive().Run("/bin/bash"),
 		Interactive: true,
 		Depends:     plan.Complete("pull_build_image"),
 		Help:        "open a shell in the build container",

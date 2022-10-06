@@ -36,15 +36,13 @@ func (steps Steps) Execute(name string) (err error) {
 				fmt.Println(step.Command)
 			}
 			if step.Function != nil {
-
-			}
-			if step.Function != nil {
 				step.Function.(func(...interface{}) error)()
-			}
-			if step.Interactive {
-				err = shell.InteractiveCommand(step.Command)
 			} else {
-				err = shell.Exec(step.Command)
+				if step.Interactive {
+					err = shell.InteractiveCommand(step.Command)
+				} else {
+					err = shell.Exec(step.Command)
+				}
 			}
 			if err != nil {
 				return
