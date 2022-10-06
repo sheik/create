@@ -2,9 +2,10 @@
 Create is a language agnostic build tool that allows you to define steps and dependencies.
 
 ## Using Create in Your Project ##
-In order to use create, first you need to install create:
+In order to use create, first go into your project directory and execute the following:
 
-     go install github.com/sheik/create/cmd/create@latest
+    go install github.com/sheik/create/cmd/create@latest
+    create update 
 
 Next, you need to make a "createfile". In order to do this, you need to create a package called "createfile" under your "cmd" directory in your project. For example:
 
@@ -24,11 +25,15 @@ Next, you need to make a "createfile". In order to do this, you need to create a
 		└── shell.go
 
 
-## Building ##
-Run "make". This will install the create tool and run it to build. The resulting output is an rpm with the "create" tool in it.
-
 ## Example Createfile ##
 See an [example here](https://github.com/sheik/create/blob/main/cmd/createfile/createfile.go)
+
+## Building ##
+Once you have installed "create" into your project and created a createfile, building your is as simple as running:
+
+    user@host:/home/user/myProject$ create <target>
+
+You can run it without specifying a target, in which case it will run whichever target has "Default" set to "true".
 
 ## License ##
 This project is licensed under the terms of the MIT license. See LICENSE.md for details.
