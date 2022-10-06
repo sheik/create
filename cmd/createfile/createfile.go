@@ -44,7 +44,6 @@ var steps = plan.Steps{
 	},
 	"pre_package": plan.Step{
 		Command: "rm -rf usr && mkdir -p usr/local/bin && cp create usr/local/bin",
-		Help:    "prepare dir structure for packaging",
 	},
 	"package": plan.Step{
 		Command: fmt.Sprintf("%s fpm --vendor CREATE -v %s -s dir -t rpm -n create usr", dockerRun, version),

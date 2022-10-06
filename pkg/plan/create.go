@@ -38,6 +38,9 @@ func (steps Steps) Execute(name string) (err error) {
 			if step.Function != nil {
 
 			}
+			if step.Function != nil {
+				step.Function.(func(...interface{}) error)()
+			}
 			if step.Interactive {
 				err = shell.InteractiveCommand(step.Command)
 			} else {
@@ -90,8 +93,7 @@ var UpdateStep = Step{
 }
 
 var HelpStep = Step{
-	Function: Steps.PrintHelp,
-	Help:     "print help message for createfile",
+	Help: "print help message for createfile",
 }
 
 func (steps Steps) PrintHelp(args ...interface{}) error {
@@ -101,7 +103,9 @@ func (steps Steps) PrintHelp(args ...interface{}) error {
 	}
 	sort.Strings(items)
 	for _, item := range items {
-		fmt.Printf("%30s : %s\n", color.Green(item), steps[item].Help)
+		if steps[item].Help != "" {
+			fmt.Printf("%30s : %s\n", color.Green(item), steps[item].Help)
+		}
 	}
 	return nil
 }
@@ -112,6 +116,7 @@ func Run(steps Steps) {
 
 	// populate Steps map with auto targets
 	steps["update"] = UpdateStep
+	HelpStep.Function = steps.PrintHelp
 	steps["help"] = HelpStep
 
 	target := flag.Arg(0)
