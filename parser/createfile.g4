@@ -1,28 +1,16 @@
 grammar createfile;
 
 file_
-   : (local | module | output | provider | variable | data | resource | terraform)+ EOF
+   : (local | module | variable | step)+ EOF
    ;
 
-terraform
-   : 'terraform' blockbody
+step
+   : stepname blockbody
    ;
 
-resource
-   : 'resource' resourcetype name blockbody
+stepname
+   : STRING
    ;
-
-data
-   : 'data' resourcetype name blockbody
-   ;
-
-provider
-  : PROVIDER resourcetype blockbody
-  ;
-
-output
-  : 'output' name blockbody
-  ;
 
 local
   : 'locals' blockbody
