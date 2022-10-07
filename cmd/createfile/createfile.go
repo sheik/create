@@ -36,7 +36,7 @@ var steps = plan.Steps{
 		Help:    "create the docker container used for building",
 	},
 	"parser": plan.Step{
-		Command: "antlr4 -Dlanguage=Go parser/createfile.g4",
+		Command: "antlr4 -Dlanguage=Go -visitor pkg/parser/createfile.g4",
 		Help:    "generate createfile parser from grammar file",
 	},
 	"build": plan.Step{
