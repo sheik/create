@@ -1,0 +1,15 @@
+project = "create"
+
+build_container {
+    shell "docker build . -t builder"
+}
+
+build {
+    deps build_container
+    shell "go build ./..."
+}
+
+package {
+    deps build_container build
+    shell "fpm -v create -t rpm -s dir -n ${project} usr"
+}

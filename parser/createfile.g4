@@ -1,7 +1,7 @@
 grammar createfile;
 
 file_
-   : (local | module | variable | step)+ EOF
+   : (local | module | variable | step | argument)+ EOF
    ;
 
 step
@@ -9,7 +9,15 @@ step
    ;
 
 stepname
-   : STRING
+   : IDENTIFIER
+   ;
+
+command
+   : 'shell' STRING
+   ;
+
+dependencies
+   : 'deps' (IDENTIFIER)*
    ;
 
 local
@@ -45,7 +53,7 @@ label
    ;
 
 blockbody
-   : LCURL (argument | block)* RCURL
+   : LCURL (argument | command | dependencies | block)* RCURL
    ;
 
 argument
